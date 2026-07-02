@@ -1,0 +1,23 @@
+[package]
+name = "wthiromc"
+version = "0.1.0"
+description = "What The Hell Is Running On My Computer"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sysinfo = "0.31"
+chrono = { version = "0.4", features = ["serde"] }
+
+[lib]
+name = "wthiromc_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "wthiromc"
+path = "src/main.rs"

@@ -223,7 +223,7 @@ wthiromc/
 
 ---
 
-## 7. Milestones (with acceptance criteria)
+## 7. Milestones
 
 **M1 — Skeleton pipeline**
 - Tauri app opens, calls a Rust command, gets back a live process list via `sysinfo`.
@@ -266,7 +266,7 @@ You can't (and shouldn't) test against real malware. Instead:
 
 ---
 
-## 9. Open Decisions (revisit as you build, not blocking to start)
+## 9. Open Decisions
 
 - Exact risk-score thresholds — tune after seeing real scores on your own machine.
 - Whether digital signature verification is in scope for v1 or v1.1 (it's the highest-value rule but also the most Windows-API-heavy).

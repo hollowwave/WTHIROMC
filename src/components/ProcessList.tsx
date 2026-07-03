@@ -7,30 +7,51 @@ interface Props {
   onSelect: (pid: number) => void;
 }
 
+function formatMemory(bytes: number): string {
+  const mb = bytes / (1024 * 1024);
+  return mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${mb.toFixed(0)} MB`;
+}
+
 export default function ProcessList({ processes, selectedPid, onSelect }: Props) {
   const sorted = [...processes].sort(
     (a, b) => RISK_ORDER.indexOf(a.riskLevel) - RISK_ORDER.indexOf(b.riskLevel)
   );
 
   return (
-    <div className="divide-y divide-neutral-800">
-      {sorted.map((p) => (
-        <button
-          key={p.pid}
-          onClick={() => onSelect(p.pid)}
-          className={`w-full text-left px-4 py-2.5 flex items-center justify-between hover:bg-neutral-900 transition-colors ${
-            selectedPid === p.pid ? "bg-neutral-900" : ""
-          }`}
-        >
-          <div className="min-w-0">
-            <p className="text-sm font-medium truncate">{p.name}</p>
-            <p className="text-xs text-neutral-500 truncate">
-              {p.publisher ?? "Unknown publisher"} - PID {p.pid}
-            </p>
-          </div>
-          <RiskBadge level={p.riskLevel} />
-        </button>
-      ))}
-    </div>
+    <table className="w-full text-sm">
+      <thead className="sticky top-0 bg-neutral-950 border-b border-neutral-800 text-xs text-neutral-500 uppercase tracking-wide">
+        <tr>
+          <th className="text-left font-medium px-4 py-2">Name</th>
+          <th className="text-left font-medium px-4 py-2">Publisher</th>
+          <th className="text-right font-medium px-4 py-2">CPU</th>
+          <th className="text-right font-medium px-4 py-2">Memory</th>
+          <th className="text-right font-medium px-4 py-2">Risk</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-neutral-900">
+        {sorted.map((p) => {
+          const isGreen = p.riskLevel === "Green";
+          return (
+            <tr
+              key={p.pid}
+              onClick={() => onSelect(p.pid)}
+              className={`cursor-pointer hover:bg-neutral-900 transition-colors ${
+                selectedPid === p.pid ? "bg-neutral-900" : ""
+              } ${isGreen ? "text-neutral-500" : "text-neutral-100"}`}
+            >
+              <td className="px-4 py-2 truncate max-w-[180px]">{p.name}</td>
+              <td className="px-4 py-2 truncate max-w-[160px]">
+                {p.publisher ?? <span className="text-neutral-600">Unknown</span>}
+              </td>
+              <td className="px-4 py-2 text-right tabular-nums">{p.cpuUsage.toFixed(0)}%</td>
+              <td className="px-4 py-2 text-right tabular-nums">{formatMemory(p.memoryBytes)}</td>
+              <td className="px-4 py-2 text-right">
+                <RiskBadge level={p.riskLevel} />
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }

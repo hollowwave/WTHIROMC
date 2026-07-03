@@ -1,0 +1,22 @@
+# Node
+node_modules/
+dist/
+package-lock.json
+
+# Rust/Cargo
+src-tauri/target/
+Cargo.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Tauri
+src-tauri/tauri.conf.json.bak

@@ -80,7 +80,7 @@ pub fn network_no_publisher(facts: &ProcessFacts) -> Option<RuleHit> {
 }
 
 pub fn high_cpu_unknown(facts: &ProcessFacts) -> Option<RuleHit> {
-    if facts.cpu_usage > 40.0 && facts.publisher.is_none() {
+    if facts.cpu_usage > 60.0 && facts.publisher.is_none() {
         hit("high_cpu_unknown", 10)
     } else {
         None

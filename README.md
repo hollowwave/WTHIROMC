@@ -1,17 +1,11 @@
 ![banner](assets/banner.png)
 
 # WTHIROMC
-
 **What The Hell Is Running On My Computer**
 
 An open-source desktop assistant that translates what's running on your computer — and what's set to run automatically — into plain English, so you can tell what's normal and what's worth worrying about, without needing to know what a registry key is.
 
 > Cybersecurity tools tell you what happened. WTHIROMC tells you what it means.
-
-<!-- 
-TODO before publishing: add a real screenshot or short GIF here, e.g.:
-![WTHIROMC screenshot](docs/screenshot.png)
--->
 
 ## What it does
 
@@ -20,10 +14,6 @@ TODO before publishing: add a real screenshot or short GIF here, e.g.:
 - **Digital signature verification** — checks real Windows Authenticode signatures rather than guessing, and shows the actual publisher name where available.
 
 It is **not** an antivirus replacement. It doesn't remove anything or claim certainty — it surfaces signals and explains them, and leaves the judgment call to you.
-
-
-
-See [`docs/plan.md`](./docs/plan.md) for the full technical plan, architecture rationale, and rule design.
 
 ## Architecture
 

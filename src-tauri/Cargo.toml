@@ -26,4 +26,5 @@ path = "src/lib.rs"
 [[bin]]
 name = "wthiromc"
 path = "src/main.rs"
+windows = [{ subsystem = "windows" }]
 

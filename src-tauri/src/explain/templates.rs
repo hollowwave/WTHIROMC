@@ -21,6 +21,9 @@ pub fn render(hit: &RuleHit) -> String {
         "high_cpu_unknown" => {
             "This program is using a lot of your computer's processing power and has no verified publisher."
         }
+        "persistence_via_scheduled_task" => {
+            "This program uses a scheduled task to launch automatically, and it isn't signed by a known publisher."
+        }
         other => return format!("Flagged by rule: {other}"),
     };
 
@@ -50,3 +53,4 @@ mod tests {
         assert!(render(&h).contains("made_up_rule"));
     }
 }
+

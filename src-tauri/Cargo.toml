@@ -16,6 +16,7 @@ chrono = { version = "0.4", features = ["serde"] }
 
 [target.'cfg(windows)'.dependencies]
 verifysign = "0.2"
+winreg= "0.55"
 
 [lib]
 name = "wthiromc_lib"

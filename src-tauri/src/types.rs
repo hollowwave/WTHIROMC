@@ -1,6 +1,41 @@
 use serde::Serialize;
 use std::collections::HashMap;
 
+/// Where a startup/persistence entry was found.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+pub enum PersistenceType {
+    RegistryRun,
+    StartupFolder,
+    ScheduledTask,
+}
+
+/// Raw facts about one thing set to run automatically (on login, on
+/// schedule, etc.) — the persistence-scanner equivalent of ProcessFacts.
+#[derive(Debug, Clone, Serialize)]
+pub struct PersistenceFacts {
+    pub name: String,
+    /// The full command/path as found in the registry, startup folder, or task.
+    pub command: String,
+    pub source: PersistenceType,
+    pub publisher: Option<String>,
+    pub is_signed: bool,
+    pub file_age_days: Option<i64>,
+}
+
+/// UI-facing shape for a persistence entry, mirroring ExplainedProcess.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExplainedPersistence {
+    pub name: String,
+    pub command: String,
+    pub source: PersistenceType,
+    pub publisher: Option<String>,
+    pub risk_level: RiskLevel,
+    pub score: i32,
+    pub summary: String,
+    pub explanations: Vec<String>,
+}
+
 /// Where a process's executable lives on disk. Used by rules like
 /// "runs from a folder legitimate software rarely lives in".
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -85,3 +120,4 @@ pub struct ExplainedProcess {
     pub summary: String,
     pub explanations: Vec<String>,
 }
+

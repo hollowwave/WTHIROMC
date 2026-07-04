@@ -1,4 +1,4 @@
-use crate::types::{ExplainedProcess, ProcessFacts, RiskLevel, RiskResult};
+use crate::types::{ExplainedPersistence, ExplainedProcess, PersistenceFacts, ProcessFacts, RiskLevel, RiskResult};
 
 pub mod templates;
 
@@ -54,6 +54,55 @@ fn summarize(risk: &RiskResult) -> String {
                 "This program is sending data to the internet with no way to verify who's receiving it.".to_string()
             } else {
                 "This program shows several strong signs of suspicious behavior and deserves a closer look.".to_string()
+            }
+        }
+    }
+}
+
+/// Persistence-entry counterpart to `explain`. Kept as a separate function
+/// (rather than a generic over both fact types) since the two have
+/// different summary logic and different UI-facing shapes.
+pub fn explain_persistence(facts: &PersistenceFacts, risk: &RiskResult) -> ExplainedPersistence {
+    let explanations: Vec<String> = risk
+        .hits
+        .iter()
+        .filter(|h| h.weight > 0)
+        .map(|h| templates::render(h))
+        .collect();
+
+    let summary = summarize_persistence(risk);
+
+    ExplainedPersistence {
+        name: facts.name.clone(),
+        command: facts.command.clone(),
+        source: facts.source,
+        publisher: facts.publisher.clone(),
+        risk_level: risk.level,
+        score: risk.score,
+        summary,
+        explanations,
+    }
+}
+
+fn summarize_persistence(risk: &RiskResult) -> String {
+    let rule_ids: Vec<&str> = risk.hits.iter().map(|h| h.rule_id).collect();
+    let has = |id: &str| rule_ids.contains(&id);
+
+    match risk.level {
+        RiskLevel::Green => "This looks like a normal startup entry.".to_string(),
+        RiskLevel::Yellow => {
+            "A few things about this startup entry are worth a second look.".to_string()
+        }
+        RiskLevel::Orange => {
+            "This startup entry shows a combination of traits that's worth investigating.".to_string()
+        }
+        RiskLevel::Red | RiskLevel::Black => {
+            if has("persistence_via_scheduled_task") {
+                "This program uses a scheduled task to run automatically and isn't signed by a known publisher — a technique sometimes used to survive reboots without showing up in the usual startup list.".to_string()
+            } else if has("recent_file") && has("unsigned_binary") {
+                "This is an unsigned program that was added to your startup very recently.".to_string()
+            } else {
+                "This startup entry shows several strong signs of suspicious behavior and deserves a closer look.".to_string()
             }
         }
     }

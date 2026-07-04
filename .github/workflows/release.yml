@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (MSVC toolchain)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache cargo registry and build output
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run tests before building a release
+        working-directory: src-tauri
+        run: cargo test --all-features
+
+      - name: Build the Tauri app (NSIS installer + MSI)
+        run: npm run tauri build
+
+      - name: Generate SHA256 checksums
+        # Users should be able to verify the installer they download actually
+        # matches what CI built, rather than trusting an unsigned .exe blindly.
+        run: |
+          $bundleDir = "src-tauri/target/release/bundle"
+          Get-ChildItem -Path $bundleDir -Recurse -Include *.exe,*.msi | ForEach-Object {
+            $hash = Get-FileHash -Algorithm SHA256 $_.FullName
+            "$($hash.Hash)  $($_.Name)" | Out-File -Append -FilePath "$bundleDir/SHA256SUMS.txt" -Encoding ascii
+          }
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            src-tauri/target/release/bundle/nsis/*.exe
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/bundle/SHA256SUMS.txt
+          generate_release_notes: true

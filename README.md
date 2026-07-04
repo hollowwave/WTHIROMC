@@ -1,9 +1,15 @@
 # WTHIROMC
-#What The Hell Is Running On My Computer**
+
+**What The Hell Is Running On My Computer**
 
 An open-source desktop assistant that translates what's running on your computer — and what's set to run automatically — into plain English, so you can tell what's normal and what's worth worrying about, without needing to know what a registry key is.
 
 > Cybersecurity tools tell you what happened. WTHIROMC tells you what it means.
+
+<!-- 
+TODO before publishing: add a real screenshot or short GIF here, e.g.:
+![WTHIROMC screenshot](docs/screenshot.png)
+-->
 
 ## What it does
 
@@ -12,6 +18,10 @@ An open-source desktop assistant that translates what's running on your computer
 - **Digital signature verification** — checks real Windows Authenticode signatures rather than guessing, and shows the actual publisher name where available.
 
 It is **not** an antivirus replacement. It doesn't remove anything or claim certainty — it surfaces signals and explains them, and leaves the judgment call to you.
+
+
+
+See [`docs/plan.md`](./docs/plan.md) for the full technical plan, architecture rationale, and rule design.
 
 ## Architecture
 
@@ -30,6 +40,14 @@ Three layers, deliberately decoupled:
 
 - `Tab` — switch between Running Processes and Startup Items
 - `Escape` — clear the current selection
+
+## Install (for non-developers)
+
+Grab the latest installer from the [Releases page](../../releases) — no Rust, Node, or build tools required.
+
+**Verify your download** before running it: every release includes a `SHA256SUMS.txt`. See [`SECURITY.md`](./SECURITY.md#verifying-release-downloads) for verification steps. The installer is currently unsigned, so Windows SmartScreen may warn about it — checksum verification confirms the file matches what CI built from the public source.
+
+## For developers
 
 ## Prerequisites
 
@@ -68,7 +86,11 @@ All rule engine and explanation engine tests run against synthetic facts (`Proce
 
 ## Roadmap (not yet built)
 
-Browser extension analysis, network behavior analysis with geo-IP context, scam link analyzer, file reputation engine, community threat intelligence network, cloud backend, infection timeline reconstruction, LLM-assisted explanation polish for cases the templates don't cover well.
+See [`ROADMAP.md`](./ROADMAP.md) for the full, phased plan — includes fixing current known limitations (locale-robust scheduled task parsing, `.lnk` resolution, real network detection), planned user workflows (allowlisting, scan history, export), and the larger deferred features from the original vision (browser extension analysis, network geo-IP, community threat intelligence, etc.).
+
+## Contributing
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for setup, code style, and PR guidelines. Found a security issue in WTHIROMC itself? See [`SECURITY.md`](./SECURITY.md) instead of opening a public issue.
 
 ## Project structure
 
@@ -103,4 +125,3 @@ docs/plan.md                 Full technical plan and design rationale
 ## License
 
 MIT — see [`LICENSE`](./LICENSE).
-

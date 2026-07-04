@@ -1,3 +1,12 @@
+//! Turns raw facts into a weighted risk score. Every rule is a pure
+//! function (facts in, optional `RuleHit` out) so it can be tested with
+//! fabricated data — no real process, registry, or file needed.
+//!
+//! Process rules (`process_rules`) and persistence rules
+//! (`persistence_rules`) are kept as separate rule sets, even where the
+//! underlying signal is similar (e.g. "unsigned binary"), so each can be
+//! tuned independently without affecting the other.
+
 use crate::types::{PersistenceFacts, ProcessFacts, RiskLevel, RiskResult, RuleHit};
 
 pub mod persistence_rules;

@@ -1,3 +1,8 @@
+//! Turns a risk score into plain-English sentences. This is the module to
+//! touch if/when an LLM is ever added — `explain()` and `explain_persistence()`
+//! are the two functions with that seam; everything upstream (collection,
+//! scoring) stays untouched either way.
+
 use crate::types::{ExplainedPersistence, ExplainedProcess, PersistenceFacts, ProcessFacts, RiskLevel, RiskResult};
 
 pub mod templates;
@@ -107,3 +112,4 @@ fn summarize_persistence(risk: &RiskResult) -> String {
         }
     }
 }
+

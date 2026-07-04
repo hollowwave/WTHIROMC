@@ -1,10 +1,10 @@
 use crate::types::{ProcessFacts, RunLocation};
+use rayon::prelude::*;
 use std::path::Path;
 use sysinfo::System;
+
 use super::signature;
 
-/// Classifies where an executable lives. This is intentionally simple string
-/// good enough for the rule engine, no Windows-specific APIs required.
 fn classify_run_location(exe_path: &str) -> RunLocation {
     let lower = exe_path.to_lowercase();
     if lower.contains("\\windows\\system32") {
@@ -22,7 +22,6 @@ fn classify_run_location(exe_path: &str) -> RunLocation {
     }
 }
 
-/// Best-effort file age in days from filesystem metadata. Returns None if the file can't be stat'd (e.g. process already exited).
 fn file_age_days(exe_path: &str) -> Option<i64> {
     let metadata = std::fs::metadata(Path::new(exe_path)).ok()?;
     let created = metadata.created().ok()?;
@@ -34,8 +33,10 @@ pub fn collect_processes() -> Vec<ProcessFacts> {
     let mut sys = System::new_all();
     sys.refresh_all();
 
-    sys.processes()
-        .iter()
+    let entries: Vec<_> = sys.processes().iter().collect();
+
+    entries
+        .par_iter()
         .map(|(pid, proc)| {
             let exe_path = proc
                 .exe()
@@ -53,10 +54,11 @@ pub fn collect_processes() -> Vec<ProcessFacts> {
                 file_age_days: file_age_days(&exe_path),
                 cpu_usage: proc.cpu_usage(),
                 memory_bytes: proc.memory(),
-                has_network_activity: false, // TODO(M3+): real network data
-                is_autostart: false,         // TODO(M6): cross-reference persistence scan
+                has_network_activity: false,
+                is_autostart: false,
                 run_location: classify_run_location(&exe_path),
             }
         })
         .collect()
 }
+

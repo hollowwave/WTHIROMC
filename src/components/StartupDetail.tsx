@@ -1,26 +1,25 @@
 import { useState } from "react";
-import { ExplainedProcess } from "../types/explained";
+import { ExplainedPersistence, SOURCE_LABEL } from "../types/explained";
 import RiskBadge from "./RiskBadge";
 
-export default function ProcessDetail({ process }: { process: ExplainedProcess | null }) {
+export default function StartupDetail({ entry }: { entry: ExplainedPersistence | null }) {
   const [copied, setCopied] = useState(false);
 
-  if (!process) {
+  if (!entry) {
     return (
       <div className="flex h-full items-center justify-center text-neutral-500 text-sm">
-        Select a process to see why it's flagged.
+        Select a startup entry to see why it's flagged.
       </div>
     );
   }
 
-  const copyPath = async () => {
+  const copyCommand = async () => {
     try {
-      await navigator.clipboard.writeText(process.exePath);
+      await navigator.clipboard.writeText(entry.command);
       setCopied(true);
       setTimeout(() => setCopied(false), 1200);
     } catch {
-      // Clipboard access can fail (permissions, unsupported context) - not
-      // worth surfacing an error for a convenience feature.
+      // Convenience feature only - not worth surfacing an error if it fails.
     }
   };
 
@@ -28,29 +27,30 @@ export default function ProcessDetail({ process }: { process: ExplainedProcess |
     <div className="p-4 space-y-4">
       <div>
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold">{process.name}</h2>
-          <RiskBadge level={process.riskLevel} />
+          <h2 className="text-lg font-semibold">{entry.name}</h2>
+          <RiskBadge level={entry.riskLevel} />
         </div>
+        <p className="text-sm text-neutral-400">{SOURCE_LABEL[entry.source]}</p>
         <button
-          onClick={copyPath}
+          onClick={copyCommand}
           title="Click to copy"
-          className="text-sm text-neutral-400 hover:text-neutral-200 text-left break-all"
+          className="text-xs text-neutral-500 hover:text-neutral-300 break-all mt-1 text-left"
         >
-          {process.exePath} {copied && <span className="text-risk-green">(copied)</span>}
+          {entry.command} {copied && <span className="text-risk-green">(copied)</span>}
         </button>
       </div>
 
       <div className="rounded-md border border-neutral-800 bg-neutral-900 p-3">
-        <p className="text-sm">{process.summary}</p>
+        <p className="text-sm">{entry.summary}</p>
       </div>
 
-      {process.explanations.length > 0 && (
+      {entry.explanations.length > 0 && (
         <div>
           <h3 className="text-xs uppercase tracking-wide text-neutral-500 mb-2">
             Why this is flagged
           </h3>
           <ul className="space-y-1.5 text-sm text-neutral-300">
-            {process.explanations.map((line, i) => (
+            {entry.explanations.map((line, i) => (
               <li key={i} className="flex gap-2">
                 <span className="text-neutral-600">-</span>
                 <span>{line}</span>

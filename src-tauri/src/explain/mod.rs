@@ -16,7 +16,7 @@ pub fn explain(facts: &ProcessFacts, risk: &RiskResult) -> ExplainedProcess {
         .hits
         .iter()
         .filter(|h| h.weight > 0) // don't surface negative/"safe" rules as warnings
-        .map(|h| templates::render(h))
+        .map(templates::render)
         .collect();
 
     let summary = summarize(risk);

@@ -8,6 +8,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write  # needed to create releases and upload artifacts
+
 jobs:
   build-and-release:
     runs-on: windows-latest
@@ -53,8 +56,10 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             src-tauri/target/release/bundle/nsis/*.exe
             src-tauri/target/release/bundle/msi/*.msi
             src-tauri/target/release/bundle/SHA256SUMS.txt
-          generate_release_notes: true
+          draft: false
+          prerelease: false

@@ -1,3 +1,5 @@
+![banner](assets/banner.png)
+
 # WTHIROMC
 
 **What The Hell Is Running On My Computer**

@@ -1,3 +1,4 @@
+
 use serde::Serialize;
 use std::collections::HashMap;
 
@@ -19,6 +20,8 @@ pub struct PersistenceFacts {
     pub source: PersistenceType,
     pub publisher: Option<String>,
     pub is_signed: bool,
+    /// Why the file is unsigned, if it is - see `SignatureInfo::detail`.
+    pub signature_detail: Option<String>,
     pub file_age_days: Option<i64>,
 }
 
@@ -57,6 +60,8 @@ pub struct ProcessFacts {
     pub exe_path: String,
     pub publisher: Option<String>,
     pub is_signed: bool,
+    /// Why the file is unsigned, if it is - see `SignatureInfo::detail`.
+    pub signature_detail: Option<String>,
     /// Age of the executable file in days, if we could determine it.
     pub file_age_days: Option<i64>,
     pub cpu_usage: f32,

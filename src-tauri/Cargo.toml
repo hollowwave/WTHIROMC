@@ -18,6 +18,7 @@ rayon = "1"
 [target.'cfg(windows)'.dependencies]
 verifysign = "0.2"
 winreg = "0.55"
+lnk = "0.6"
 
 [lib]
 name = "wthiromc_lib"

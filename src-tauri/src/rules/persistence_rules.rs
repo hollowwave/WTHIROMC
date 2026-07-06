@@ -22,7 +22,13 @@ fn hit_with(rule_id: &'static str, weight: i32, context: HashMap<String, String>
 
 pub fn unsigned_binary(facts: &PersistenceFacts) -> Option<RuleHit> {
     if !facts.is_signed {
-        hit("unsigned_binary", 15)
+        let mut ctx = HashMap::new();
+        let detail = facts
+            .signature_detail
+            .clone()
+            .unwrap_or_else(|| "no signature was found on the file".to_string());
+        ctx.insert("detail".to_string(), detail);
+        hit_with("unsigned_binary", 15, ctx)
     } else {
         None
     }
@@ -77,6 +83,7 @@ mod tests {
             source: PersistenceType::RegistryRun,
             publisher: Some("Microsoft Corporation".to_string()),
             is_signed: true,
+            signature_detail: None,
             file_age_days: Some(400),
         }
     }

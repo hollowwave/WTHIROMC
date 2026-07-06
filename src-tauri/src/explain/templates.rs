@@ -5,7 +5,7 @@ use crate::types::RuleHit;
 pub fn render(hit: &RuleHit) -> String {
     let template = match hit.rule_id {
         "unsigned_binary" => {
-            "This program is not digitally signed, so there's no way to verify who made it."
+            "This program is not digitally signed — {detail} — so there's no way to verify who made it."
         }
         "unknown_publisher" => "This program doesn't identify a publisher.",
         "recent_file" => "This program appeared on your system {days_old} day(s) ago.",

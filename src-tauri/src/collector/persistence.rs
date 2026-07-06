@@ -8,10 +8,15 @@ use super::signature;
 /// the process collector's version — duplicated rather than shared to keep
 /// this module self-contained; worth extracting to a shared util if a
 /// third caller shows up).
+///
+/// Prefers creation time, but falls back to modified time since `created()`
+/// isn't available on every filesystem/permission level. Modified time is a
+/// weaker signal (a copied or updated file changes it without necessarily
+/// being new), but it's better than no signal at all.
 fn file_age_days(path: &str) -> Option<i64> {
     let metadata = std::fs::metadata(Path::new(path)).ok()?;
-    let created = metadata.created().ok()?;
-    let age = created.elapsed().ok()?;
+    let reference_time = metadata.created().or_else(|_| metadata.modified()).ok()?;
+    let age = reference_time.elapsed().ok()?;
     Some(age.as_secs() as i64 / 86400)
 }
 
@@ -34,14 +39,28 @@ fn extract_exe_path(command: &str) -> String {
 
 fn build_entry(name: String, command: String, source: PersistenceType) -> PersistenceFacts {
     let exe_path = extract_exe_path(&command);
-    let sig = signature::check_signature(&exe_path);
+    build_entry_checking(name, command, source, &exe_path)
+}
+
+/// Same as `build_entry`, but lets the caller specify a different path to
+/// run the signature/age check against than what's shown as the command —
+/// needed for shortcuts, where we want to check the *target* the shortcut
+/// points to, not the .lnk file itself.
+fn build_entry_checking(
+    name: String,
+    command: String,
+    source: PersistenceType,
+    check_path: &str,
+) -> PersistenceFacts {
+    let sig = signature::check_signature(check_path);
     PersistenceFacts {
         name,
         command,
         source,
         publisher: sig.publisher,
         is_signed: sig.is_signed,
-        file_age_days: file_age_days(&exe_path),
+        signature_detail: sig.detail,
+        file_age_days: file_age_days(check_path),
     }
 }
 
@@ -109,11 +128,54 @@ fn scan_startup_dir(dir: &Path) -> Vec<PersistenceFacts> {
             continue;
         }
         let name = entry.file_name().to_string_lossy().to_string();
-        let command = path.to_string_lossy().to_string();
-        results.push(build_entry(name, command, PersistenceType::StartupFolder));
+        let raw_path = path.to_string_lossy().to_string();
+        let is_shortcut = path
+            .extension()
+            .and_then(|e| e.to_str())
+            .is_some_and(|e| e.eq_ignore_ascii_case("lnk"));
+
+        if is_shortcut {
+            match resolve_shortcut_target(&path) {
+                // Resolved the shortcut's real target - check that, not the
+                // .lnk file, and show both in the command string so the
+                // user can see the shortcut resolved somewhere unexpected.
+                Some(target) => {
+                    let command = format!("{raw_path} -> {target}");
+                    results.push(build_entry_checking(
+                        name,
+                        command,
+                        PersistenceType::StartupFolder,
+                        &target,
+                    ));
+                }
+                // Couldn't resolve it (corrupt shortcut, unusual link type) -
+                // fall back to checking the .lnk file itself, same as before
+                // this feature existed. Better a slightly-wrong signature
+                // check than silently dropping the entry.
+                None => {
+                    results.push(build_entry(name, raw_path, PersistenceType::StartupFolder));
+                }
+            }
+        } else {
+            results.push(build_entry(name, raw_path, PersistenceType::StartupFolder));
+        }
     }
 
     results
+}
+
+/// Resolves a .lnk shortcut to the file path it actually points at, using a
+/// pure-Rust parser (no COM/unsafe FFI needed) rather than the Shell Link
+/// API. Returns None if the file can't be parsed or has no resolvable target.
+#[cfg(windows)]
+fn resolve_shortcut_target(lnk_path: &Path) -> Option<String> {
+    let shortcut = lnk::ShellLink::open(lnk_path, lnk::encoding::WINDOWS_1252).ok()?;
+    shortcut.link_target()
+}
+
+#[cfg(not(windows))]
+fn resolve_shortcut_target(_lnk_path: &Path) -> Option<String> {
+    None
 }
 
 fn collect_startup_folder() -> Vec<PersistenceFacts> {

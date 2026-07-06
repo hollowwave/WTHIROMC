@@ -9,6 +9,7 @@ fn clean_process() -> ProcessFacts {
         exe_path: "C:\\Windows\\System32\\explorer.exe".to_string(),
         publisher: Some("Microsoft Corporation".to_string()),
         is_signed: true,
+        signature_detail: None,
         file_age_days: Some(1000),
         cpu_usage: 2.0,
         memory_bytes: 50_000_000,
@@ -25,6 +26,7 @@ fn simulated_malware() -> ProcessFacts {
         exe_path: "C:\\Users\\test\\Downloads\\Minecraft_Free_Premium.exe".to_string(),
         publisher: None,
         is_signed: false,
+        signature_detail: Some("no signature was found on the file".to_string()),
         file_age_days: Some(0),
         cpu_usage: 5.0,
         memory_bytes: 10_000_000,
@@ -71,3 +73,4 @@ fn simulated_malware_scores_high_and_explains_why() {
     // The combined-pattern summary should fire since recent + autostart + unsigned all hit.
     assert!(explained.summary.contains("installed very recently"));
 }
+

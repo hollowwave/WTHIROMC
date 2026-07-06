@@ -75,9 +75,9 @@ fn verify_uncached(exe_path: &str) -> SignatureInfo {
             // guaranteed, so this gives a real, specific reason (e.g.
             // "Unsigned", or a revoked/tampered cert message) rather than
             // us trying to enumerate every variant ourselves.
-            Err(e) => SignatureInfo::unsigned_verification_failed(e.to_string()),
+            Err(e) => SignatureInfo::unsigned_verification_failed(format!("{:?}", e)),
         },
-        Err(e) => SignatureInfo::unsigned_verification_failed(e.to_string()),
+        Err(e) => SignatureInfo::unsigned_verification_failed(format!("{:?}", e)),
     }
 }
 

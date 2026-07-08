@@ -26,7 +26,7 @@ Two parallel pipelines share this shape: one for running processes, one for star
 Three layers, deliberately decoupled:
 - **`collector`** gathers raw facts. No judgment calls.
 - **`rules`** scores facts against pure, unit-testable heuristics. No knowledge of where facts came from or how they'll be displayed.
-- **`explain`** turns a score into a sentence a non-expert can read. This is the one seam designed for an LLM later — see `explain::explain()` / `explain::explain_persistence()`.
+- **`explain`** turns a score into a sentence a non-expert can read. This is the one seam designed for an LLM later; see `explain::explain()` / `explain::explain_persistence()`.
 
 ## Keyboard shortcuts
 
@@ -37,7 +37,7 @@ Three layers, deliberately decoupled:
 
 Grab the latest installer from the [Releases page](../../releases) no Rust, Node, or build tools required.
 
-**Verify your download** before running it: every release includes a `SHA256SUMS.txt`. See [`SECURITY.md`](./SECURITY.md#verifying-release-downloads) for verification steps. The installer is currently unsigned, so Windows SmartScreen may warn about it — checksum verification confirms the file matches what CI built from the public source.
+**Verify your download** before running it: every release includes a `SHA256SUMS.txt`. See [`SECURITY.md`](./SECURITY.md#verifying-release-downloads) for verification steps. The installer is currently unsigned, so Windows SmartScreen may warn about it, checksum verification confirms the file matches what CI built from the public source.
 
 # For developers
 ## Prerequisites
@@ -77,7 +77,7 @@ All rule engine and explanation engine tests run against synthetic facts (`Proce
 
 ## Roadmap (not yet built)
 
-See [`ROADMAP.md`](./ROADMAP.md) for the full, phased plan — includes fixing current known limitations (locale-robust scheduled task parsing, `.lnk` resolution, real network detection), planned user workflows (allowlisting, scan history, export), and the larger deferred features from the original vision (browser extension analysis, network geo-IP, community threat intelligence, etc.).
+See [`ROADMAP.md`](./ROADMAP.md) for the full, phased plan includes fixing current known limitations (locale-robust scheduled task parsing, `.lnk` resolution, real network detection), planned user workflows (allowlisting, scan history, export), and the larger deferred features from the original vision (browser extension analysis, network geo-IP, community threat intelligence, etc.).
 
 ## Contributing
 

@@ -1,4 +1,3 @@
-
 use serde::Serialize;
 use std::collections::HashMap;
 
@@ -37,6 +36,10 @@ pub struct ExplainedPersistence {
     pub score: i32,
     pub summary: String,
     pub explanations: Vec<String>,
+    /// True if the user explicitly marked this safe via the allowlist -
+    /// distinct from something that's naturally Green, so the UI can offer
+    /// "remove from safe list" only where it actually applies.
+    pub user_marked_safe: bool,
 }
 
 /// Where a process's executable lives on disk. Used by rules like
@@ -124,5 +127,5 @@ pub struct ExplainedProcess {
     pub score: i32,
     pub summary: String,
     pub explanations: Vec<String>,
+    pub user_marked_safe: bool,
 }
-

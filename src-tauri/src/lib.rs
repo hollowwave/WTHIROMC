@@ -14,6 +14,7 @@
 //!
 //! See `docs/plan.md` for the full design rationale and milestone plan.
 
+pub mod allowlist;
 pub mod collector;
 pub mod commands;
 pub mod explain;

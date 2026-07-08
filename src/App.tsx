@@ -178,9 +178,9 @@ export default function App() {
         </div>
         <div className="w-96 overflow-y-auto">
           {isProcessesTab ? (
-            <ProcessDetail process={selectedProcess} />
+            <ProcessDetail process={selectedProcess} onSafetyChanged={loadProcesses} />
           ) : (
-            <StartupDetail entry={selectedStartup} />
+            <StartupDetail entry={selectedStartup} onSafetyChanged={loadStartupItems} />
           )}
         </div>
       </main>

@@ -1,9 +1,17 @@
 import { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { ExplainedPersistence, SOURCE_LABEL } from "../types/explained";
 import RiskBadge from "./RiskBadge";
+import { entryKey } from "./StartupList";
 
-export default function StartupDetail({ entry }: { entry: ExplainedPersistence | null }) {
+interface Props {
+  entry: ExplainedPersistence | null;
+  onSafetyChanged: () => void;
+}
+
+export default function StartupDetail({ entry, onSafetyChanged }: Props) {
   const [copied, setCopied] = useState(false);
+  const [working, setWorking] = useState(false);
 
   if (!entry) {
     return (
@@ -20,6 +28,23 @@ export default function StartupDetail({ entry }: { entry: ExplainedPersistence |
       setTimeout(() => setCopied(false), 1200);
     } catch {
       // Convenience feature only - not worth surfacing an error if it fails.
+    }
+  };
+
+  const toggleSafe = async () => {
+    setWorking(true);
+    const identifier = entryKey(entry);
+    try {
+      if (entry.userMarkedSafe) {
+        await invoke("unmark_startup_safe", { identifier });
+      } else {
+        await invoke("mark_startup_safe", { identifier, name: entry.name });
+      }
+      onSafetyChanged();
+    } catch (e) {
+      console.error("Failed to update allowlist:", e);
+    } finally {
+      setWorking(false);
     }
   };
 
@@ -59,6 +84,18 @@ export default function StartupDetail({ entry }: { entry: ExplainedPersistence |
           </ul>
         </div>
       )}
+
+      <button
+        onClick={toggleSafe}
+        disabled={working}
+        className={`text-xs rounded-md border px-3 py-1.5 disabled:opacity-50 ${
+          entry.userMarkedSafe
+            ? "border-neutral-700 text-neutral-400 hover:bg-neutral-900"
+            : "border-risk-green/40 text-risk-green hover:bg-risk-green/10"
+        }`}
+      >
+        {entry.userMarkedSafe ? "Remove from safe list" : "Mark as safe"}
+      </button>
     </div>
   );
 }

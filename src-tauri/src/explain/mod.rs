@@ -32,6 +32,7 @@ pub fn explain(facts: &ProcessFacts, risk: &RiskResult) -> ExplainedProcess {
         score: risk.score,
         summary,
         explanations,
+        user_marked_safe: false,
     }
 }
 
@@ -72,7 +73,7 @@ pub fn explain_persistence(facts: &PersistenceFacts, risk: &RiskResult) -> Expla
         .hits
         .iter()
         .filter(|h| h.weight > 0)
-        .map(|h| templates::render(h))
+        .map(templates::render)
         .collect();
 
     let summary = summarize_persistence(risk);
@@ -86,6 +87,7 @@ pub fn explain_persistence(facts: &PersistenceFacts, risk: &RiskResult) -> Expla
         score: risk.score,
         summary,
         explanations,
+        user_marked_safe: false,
     }
 }
 

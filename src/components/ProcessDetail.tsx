@@ -1,9 +1,17 @@
 import { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { ExplainedProcess } from "../types/explained";
 import RiskBadge from "./RiskBadge";
 
-export default function ProcessDetail({ process }: { process: ExplainedProcess | null }) {
+interface Props {
+  process: ExplainedProcess | null;
+  /** Called after a successful mark/unmark so the parent can re-fetch the scan. */
+  onSafetyChanged: () => void;
+}
+
+export default function ProcessDetail({ process, onSafetyChanged }: Props) {
   const [copied, setCopied] = useState(false);
+  const [working, setWorking] = useState(false);
 
   if (!process) {
     return (
@@ -21,6 +29,22 @@ export default function ProcessDetail({ process }: { process: ExplainedProcess |
     } catch {
       // Clipboard access can fail (permissions, unsupported context) - not
       // worth surfacing an error for a convenience feature.
+    }
+  };
+
+  const toggleSafe = async () => {
+    setWorking(true);
+    try {
+      if (process.userMarkedSafe) {
+        await invoke("unmark_process_safe", { exePath: process.exePath });
+      } else {
+        await invoke("mark_process_safe", { exePath: process.exePath, name: process.name });
+      }
+      onSafetyChanged();
+    } catch (e) {
+      console.error("Failed to update allowlist:", e);
+    } finally {
+      setWorking(false);
     }
   };
 
@@ -59,6 +83,18 @@ export default function ProcessDetail({ process }: { process: ExplainedProcess |
           </ul>
         </div>
       )}
+
+      <button
+        onClick={toggleSafe}
+        disabled={working}
+        className={`text-xs rounded-md border px-3 py-1.5 disabled:opacity-50 ${
+          process.userMarkedSafe
+            ? "border-neutral-700 text-neutral-400 hover:bg-neutral-900"
+            : "border-risk-green/40 text-risk-green hover:bg-risk-green/10"
+        }`}
+      >
+        {process.userMarkedSafe ? "Remove from safe list" : "Mark as safe"}
+      </button>
     </div>
   );
 }

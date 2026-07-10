@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { ExplainedPersistence, SOURCE_LABEL } from "../types/explained";
 import RiskBadge from "./RiskBadge";
 import { entryKey } from "./StartupList";
+import { getIncidentGuidance } from "../lib/incidentGuidance";
 
 interface Props {
   entry: ExplainedPersistence | null;
@@ -91,6 +92,17 @@ export default function StartupDetail({ entry, onSafetyChanged }: Props) {
         </div>
       )}
 
+      {getIncidentGuidance(entry.riskLevel) && (
+        <div className="rounded-md border border-risk-red/30 bg-risk-red/5 p-3">
+          <h3 className="text-xs uppercase tracking-wide text-risk-red mb-2">What to do next</h3>
+          <ol className="space-y-1.5 text-sm text-neutral-300 list-decimal list-inside">
+            {getIncidentGuidance(entry.riskLevel)!.map((line, i) => (
+              <li key={i}>{line}</li>
+            ))}
+          </ol>
+        </div>
+      )}
+
       <button
         onClick={toggleSafe}
         disabled={working}
@@ -105,4 +117,3 @@ export default function StartupDetail({ entry, onSafetyChanged }: Props) {
     </div>
   );
 }
-

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { ExplainedProcess } from "../types/explained";
 import RiskBadge from "./RiskBadge";
+import { getIncidentGuidance } from "../lib/incidentGuidance";
 
 interface Props {
   process: ExplainedProcess | null;
@@ -87,6 +88,17 @@ export default function ProcessDetail({ process, onSafetyChanged }: Props) {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {getIncidentGuidance(process.riskLevel) && (
+        <div className="rounded-md border border-risk-red/30 bg-risk-red/5 p-3">
+          <h3 className="text-xs uppercase tracking-wide text-risk-red mb-2">What to do next</h3>
+          <ol className="space-y-1.5 text-sm text-neutral-300 list-decimal list-inside">
+            {getIncidentGuidance(process.riskLevel)!.map((line, i) => (
+              <li key={i}>{line}</li>
+            ))}
+          </ol>
         </div>
       )}
 

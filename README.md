@@ -9,9 +9,19 @@ An open-source desktop assistant that translates what's running on your computer
 
 ## What it does
 
-- **Running Processes:** lists everything currently running, scores each against a set of heuristics (unsigned binaries, suspicious install locations, unknown publishers reaching the network, etc.), and explains *why* something is flagged in plain English instead of raw technical output.
-- **Startup Items:** scans registry Run keys, the Startup folder, and (non-Microsoft) scheduled tasks for anything set to launch automatically, with the same scoring and explanation treatment.
-- **Digital signature verification:** checks real Windows Authenticode signatures rather than guessing, and shows the actual publisher name where available.
+- **Running Processes**: lists everything currently running, scores each against a set of heuristics (unsigned binaries, suspicious install locations, unknown publishers reaching the network, etc.), and explains *why* something is flagged in plain English instead of raw technical output.
+
+- **Startup Items**: scans registry Run keys, the Startup folder, and (non-Microsoft) scheduled tasks for anything set to launch automatically, with the same scoring and explanation treatment.
+
+- **Digital signature verification**: checks real Windows Authenticode signatures rather than guessing, and shows the actual publisher name where available.
+
+- **"Mark as safe" allowlist**: if you've confirmed something is fine (a niche tool, something you built yourself), mark it safe once and WTHIROMC stops flagging it on future scans. Stored locally in a SQLite database under `%APPDATA%\WTHIROMC\`, never uploaded anywhere.
+
+- **"New since last time" detection**: WTHIROMC remembers what it's seen running/autostarting across previous launches and flags anything genuinely new with a small "New" tag, a real signal for catching recent compromise, independent of the risk score. (Nothing gets flagged as new on your very first-ever launch, since there's no prior baseline to compare against yet.)
+
+- **Export results**: export the current process or startup list as JSON or CSV, e.g. to share with someone helping you investigate.
+
+- **"What to do next" guidance**: Red/Black findings show concrete next steps (check VirusTotal, run a full antivirus scan, how to disable a startup item yourself). WTHIROMC never takes these actions itself, see [`CONTRIBUTING.md`](./CONTRIBUTING.md)'s ethics section.
 
 It is **not** an antivirus replacement. It doesn't remove anything or claim certainty, it surfaces signals and explains them, and leaves the judgment call to you.
 
@@ -21,7 +31,7 @@ It is **not** an antivirus replacement. It doesn't remove anything or claim cert
 Collector (Rust) -> Rule Engine (pure functions) -> Explanation Engine (templates) -> React UI
 ```
 
-Two parallel pipelines share this shape: one for running processes, one for startup/persistence entries — with independently tunable rule sets (see `rules::process_rules` vs `rules::persistence_rules`) but shared infrastructure for signature checking and template rendering.
+Two parallel pipelines share this shape: one for running processes, one for startup/persistence entries with independently tunable rule sets (see `rules::process_rules` vs `rules::persistence_rules`) but shared infrastructure for signature checking and template rendering.
 
 Three layers, deliberately decoupled:
 - **`collector`** gathers raw facts. No judgment calls.
@@ -34,7 +44,6 @@ Three layers, deliberately decoupled:
 - `Escape`: clear the current selection
 
 ## Install (for non-developers)
-
 Grab the latest installer from the [Releases page](../../releases) no Rust, Node, or build tools required.
 
 **Verify your download** before running it: every release includes a `SHA256SUMS.txt`. See [`SECURITY.md`](./SECURITY.md#verifying-release-downloads) for verification steps. The installer is currently unsigned, so Windows SmartScreen may warn about it, checksum verification confirms the file matches what CI built from the public source.
@@ -75,45 +84,9 @@ All rule engine and explanation engine tests run against synthetic facts (`Proce
 - **CPU-usage-based heuristics are sensitive to hardware** — the `high_cpu_unknown` rule's threshold is a blunt instrument; on lower-end/single-core-constrained machines it can flag legitimate CPU-intensive work. A more correct fix would normalize against core count and sustained (not instantaneous) usage.
 - **WTHIROMC flags itself as high-risk when self-built**, since a locally compiled, unsigned binary genuinely matches the "unsigned + unknown publisher" pattern. This is correct behavior for an unsigned build, not a bug, but a properly code-signed release build would score differently.
 
-## Roadmap (not yet built)
-
-See [`ROADMAP.md`](./ROADMAP.md) for the full, phased plan includes fixing current known limitations (locale-robust scheduled task parsing, `.lnk` resolution, real network detection), planned user workflows (allowlisting, scan history, export), and the larger deferred features from the original vision (browser extension analysis, network geo-IP, community threat intelligence, etc.).
-
 ## Contributing
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for setup, code style, and PR guidelines. Found a security issue in WTHIROMC itself? See [`SECURITY.md`](./SECURITY.md) instead of opening a public issue.
-
-## Project structure
-
-
-```
-src/                        React + TypeScript frontend
-  components/
-    ProcessList.tsx          Running-processes table
-    ProcessDetail.tsx        Explanation panel for a selected process
-    StartupList.tsx          Startup-items table
-    StartupDetail.tsx        Explanation panel for a selected startup entry
-    RiskBadge.tsx
-  types/explained.ts         Shared TS types mirroring the Rust data model
-
-src-tauri/src/
-  collector/
-    processes.rs             Running-process facts (sysinfo)
-    persistence.rs           Startup/autostart facts (registry, startup folder, scheduled tasks)
-    signature.rs             Digital signature verification + caching (shared by both)
-  rules/
-    process_rules.rs         Process risk heuristics
-    persistence_rules.rs     Startup-entry risk heuristics (independently tunable)
-  explain/
-    templates.rs             Rule ID -> plain-English sentence
-    mod.rs                   Explanation + summary synthesis
-  types.rs                   Shared data model
-  commands.rs                Tauri IPC commands exposed to the frontend
-
-src-tauri/tests/             Integration tests (facts -> rules -> explanation, end to end)
-docs/plan.md                 Full technical plan and design rationale
-```
-
 
 ## License
 

@@ -5,6 +5,12 @@ import ProcessList from "./components/ProcessList";
 import ProcessDetail from "./components/ProcessDetail";
 import StartupList, { entryKey } from "./components/StartupList";
 import StartupDetail from "./components/StartupDetail";
+import {
+  exportProcessesJson,
+  exportProcessesCsv,
+  exportStartupJson,
+  exportStartupCsv,
+} from "./lib/export";
 
 type Tab = "processes" | "startup";
 
@@ -97,6 +103,14 @@ export default function App() {
   const activeError = isProcessesTab ? processesError : startupError;
   const activeRescan = isProcessesTab ? loadProcesses : loadStartupItems;
 
+  const handleExport = (format: "json" | "csv") => {
+    if (isProcessesTab) {
+      format === "json" ? exportProcessesJson(processes) : exportProcessesCsv(processes);
+    } else {
+      format === "json" ? exportStartupJson(startupItems) : exportStartupCsv(startupItems);
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col">
       <header className="border-b border-neutral-800 px-4 py-3 flex items-center justify-between">
@@ -116,6 +130,20 @@ export default function App() {
               )}
             </p>
           )}
+          <button
+            onClick={() => handleExport("csv")}
+            title="Export the current list as a CSV file"
+            className="text-xs rounded-md border border-neutral-700 px-2.5 py-1 hover:bg-neutral-900"
+          >
+            Export CSV
+          </button>
+          <button
+            onClick={() => handleExport("json")}
+            title="Export the current list as a JSON file"
+            className="text-xs rounded-md border border-neutral-700 px-2.5 py-1 hover:bg-neutral-900"
+          >
+            Export JSON
+          </button>
           <button
             onClick={activeRescan}
             className="text-xs rounded-md border border-neutral-700 px-2.5 py-1 hover:bg-neutral-900"

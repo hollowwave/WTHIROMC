@@ -33,6 +33,7 @@ pub fn explain(facts: &ProcessFacts, risk: &RiskResult) -> ExplainedProcess {
         summary,
         explanations,
         user_marked_safe: false,
+        is_new: false,
     }
 }
 
@@ -88,6 +89,7 @@ pub fn explain_persistence(facts: &PersistenceFacts, risk: &RiskResult) -> Expla
         summary,
         explanations,
         user_marked_safe: false,
+        is_new: false,
     }
 }
 

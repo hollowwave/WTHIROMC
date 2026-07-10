@@ -68,6 +68,12 @@ export default function ProcessDetail({ process, onSafetyChanged }: Props) {
         <p className="text-sm">{process.summary}</p>
       </div>
 
+      {process.isNew && (
+        <p className="text-xs text-blue-400">
+          This wasn't running the last time you checked WTHIROMC.
+        </p>
+      )}
+
       {process.explanations.length > 0 && (
         <div>
           <h3 className="text-xs uppercase tracking-wide text-neutral-500 mb-2">

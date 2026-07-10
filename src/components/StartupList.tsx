@@ -38,7 +38,19 @@ export default function StartupList({ entries, selectedKey, onSelect }: Props) {
                 selectedKey === key ? "bg-neutral-900" : ""
               } ${isGreen ? "text-neutral-500" : "text-neutral-100"}`}
             >
-              <td className="px-4 py-2 truncate max-w-[220px]">{e.name}</td>
+              <td className="px-4 py-2 truncate max-w-[220px]">
+                <span className="inline-flex items-center gap-1.5">
+                  {e.name}
+                  {e.isNew && (
+                    <span
+                      title="Wasn't set to run automatically the last time you checked"
+                      className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-blue-400 border border-blue-400/40 rounded px-1"
+                    >
+                      New
+                    </span>
+                  )}
+                </span>
+              </td>
               <td className="px-4 py-2 text-neutral-400">{SOURCE_LABEL[e.source]}</td>
               <td className="px-4 py-2 truncate max-w-[160px]">
                 {e.publisher ?? <span className="text-neutral-600">Unknown</span>}

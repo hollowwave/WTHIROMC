@@ -188,6 +188,7 @@ mod tests {
             summary: String::new(),
             explanations: Vec::new(),
             user_marked_safe: false,
+            is_new: false,
         };
 
         // Must match the frontend's `entryKey()` in StartupList.tsx exactly:

@@ -40,9 +40,10 @@ pub struct ExplainedPersistence {
     /// distinct from something that's naturally Green, so the UI can offer
     /// "remove from safe list" only where it actually applies.
     pub user_marked_safe: bool,
+    /// True if this wasn't seen in any previous app launch - see the
+    /// `history` module.
+    pub is_new: bool,
 }
-
-/// Where a process's executable lives on disk. Used by rules like
 /// "runs from a folder legitimate software rarely lives in".
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum RunLocation {
@@ -128,4 +129,9 @@ pub struct ExplainedProcess {
     pub summary: String,
     pub explanations: Vec<String>,
     pub user_marked_safe: bool,
+    /// True if this wasn't seen in any previous app launch - see the
+    /// `history` module. Independent of the rule engine's score; a
+    /// perfectly Green process can still be new.
+    pub is_new: bool,
 }
+

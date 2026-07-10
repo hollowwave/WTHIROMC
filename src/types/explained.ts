@@ -12,6 +12,7 @@ export interface ExplainedProcess {
   summary: string;
   explanations: string[];
   userMarkedSafe: boolean;
+  isNew: boolean;
 }
 
 export type PersistenceSource = "RegistryRun" | "StartupFolder" | "ScheduledTask";
@@ -26,6 +27,7 @@ export interface ExplainedPersistence {
   summary: string;
   explanations: string[];
   userMarkedSafe: boolean;
+  isNew: boolean;
 }
 
 export const SOURCE_LABEL: Record<PersistenceSource, string> = {

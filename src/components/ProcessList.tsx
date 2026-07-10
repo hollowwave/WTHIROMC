@@ -39,7 +39,19 @@ export default function ProcessList({ processes, selectedPid, onSelect }: Props)
                 selectedPid === p.pid ? "bg-neutral-900" : ""
               } ${isGreen ? "text-neutral-500" : "text-neutral-100"}`}
             >
-              <td className="px-4 py-2 truncate max-w-[180px]">{p.name}</td>
+              <td className="px-4 py-2 truncate max-w-[180px]">
+                <span className="inline-flex items-center gap-1.5">
+                  {p.name}
+                  {p.isNew && (
+                    <span
+                      title="Wasn't running the last time you checked"
+                      className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-blue-400 border border-blue-400/40 rounded px-1"
+                    >
+                      New
+                    </span>
+                  )}
+                </span>
+              </td>
               <td className="px-4 py-2 truncate max-w-[160px]">
                 {p.publisher ?? <span className="text-neutral-600">Unknown</span>}
               </td>
@@ -55,3 +67,4 @@ export default function ProcessList({ processes, selectedPid, onSelect }: Props)
     </table>
   );
 }
+

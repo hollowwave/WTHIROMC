@@ -69,6 +69,12 @@ export default function StartupDetail({ entry, onSafetyChanged }: Props) {
         <p className="text-sm">{entry.summary}</p>
       </div>
 
+      {entry.isNew && (
+        <p className="text-xs text-blue-400">
+          This wasn't set to run automatically the last time you checked WTHIROMC.
+        </p>
+      )}
+
       {entry.explanations.length > 0 && (
         <div>
           <h3 className="text-xs uppercase tracking-wide text-neutral-500 mb-2">
